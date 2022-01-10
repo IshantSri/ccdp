@@ -2,9 +2,8 @@ from log_create.logger import logging
 from data_trans.clustering import kmeansclustering
 from data_trans.data_transform import data_transform
 from data_loader.importing_raw_data import datagetter
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-import xgboost
-from datetime import datetime
+from model_select.best_algo import Model_Finder
+
 class train:
     def __init__(self,data_path):
         self.logobj = logging('logs\model_building_log.txt', 'ENTERED TO DATA MODEL BUILDING MODULE')
@@ -13,6 +12,7 @@ class train:
         self.data = self.data_path.getdata()
         self.trans = data_transform()
         self.cluster = kmeansclustering()
+
 
     def training(self):
         self.logobj.appnd_log('TRAINING STARTED')
@@ -52,24 +52,8 @@ class train:
             self.logobj.appnd_log('LABEL EXTRACTION FAILED>>>>>>' + str(e))
 
         try:
-            params = {
-                "learning_rate": [0.05, 0.10, 0.15, 0.20, 0.25, 0.30],
-                "max_depth": [3, 4, 5, 6, 8, 10, 12, 15],
-                "min_child_weight": [1, 3, 5, 7],
-                "gamma": [0.0, 0.1, 0.2, 0.3, 0.4],
-                "colsample_bytree": [0.3, 0.4, 0.5, 0.7]
+            self.bestmodl = Model_Finder
 
-            }
-
-            classifier = xgboost.XGBClassifier()
-            random_search = RandomizedSearchCV(classifier, param_distributions=params, n_iter=5, scoring='roc_auc',
-                                               n_jobs=-1, cv=5, verbose=3)
-            random_search.fit(self.x, self.y)
-            self.best_estimates = random_search.best_estimator_
-
-
-        except Exception as e:
-            print(str(e))
 
 
 
