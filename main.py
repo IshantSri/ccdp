@@ -1,10 +1,6 @@
-from flask import Flask,redirect,url_for
-
-app = Flask(__name__)
-
-@app.route("/")
-def Home():
-    return "<p>CREDIT_CARD _DEFAULT _PREDICTOR</p>"
+from model_operation.model_building import train
+a = train('data.csv')
+a.training()
 
 
 
@@ -15,8 +11,3 @@ def Home():
 
 
 
-
-
-
-if __name__ == '__main__':
-    app.run(debug=True)

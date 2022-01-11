@@ -13,22 +13,21 @@ class data_transform:
         self.log_obj = logging(self.log_file, 'ENTERED TO DATA TRANSFORMATION')
         self.log_obj.log()
 
-    def null_value(self,data):
+
+    def value_imputer(self,data):
         self.data = data
-        self.check = self.data.isnull()
-        self.log_obj.appnd_log('FINDING NULL VALUES')
+        self.log_obj.appnd_log('IMPUTING NAN VALUES')
         try:
-            for i in self.check:
-                if i == True:
-                    imputer = KNNImputer(n_neighbors=3, weights='uniform', missing_values=np.nan)
-                    self.new_array = imputer.fit_transform(self.data)  # impute the missing values
+            imputer = KNNImputer(n_neighbors=3, weights='uniform', missing_values=np.nan)
+            self.new_array = imputer.fit_transform(self.data)  # impute the missing values
                     # convert the nd-array returned in the step above to a Dataframe
-                    self.new_data = pd.DataFrame(data=self.new_array, columns=self.data.columns)
-                    self.log_obj.appnd_log('Imputing missing values Successful.')
-                else:
-                    self.log_obj.appnd_log('NO NULL VALUES FOUND')
+            self.columns = self.data.columns
+            self.new_data = pd.DataFrame(data=self.new_array,columns=self.columns)
+            self.log_obj.appnd_log('Imputing NAN values Successful.')
+            return self.new_data
         except Exception as e:
-            self.log_obj.appnd_log('SOMETHING WENT WRONG AT DATA TRANSFORMATION FAILED TO TREAT MISSING VALUES-> ' + str(e))
+            self.log_obj.appnd_log('SOMETHING WENT WRONG AT DATA TRANSFORMATION FAILED TO TREAT NAN VALUES-> ' + str(e))
+
 
 
     def chng_vrbl_name(self,data):
@@ -39,6 +38,7 @@ class data_transform:
             self.data = self.data.rename(columns={'PAY_0': 'PAY_1'})
 
             self.log_obj.appnd_log('VRBL_NAME CHANGED')
+            return self.data
         except Exception as e:
             self.log_obj.appnd_log('FAILED TO CHNG_VRBL_NAME ->'+str(e))
 
@@ -48,16 +48,17 @@ class data_transform:
         self.log_obj.appnd_log('ENTERED TO DATA_TYPE')
         try:
 
-            self.data['SEX'] = self.data['SEX'].astype('category')
-            self.data['EDUCATION'] = self.data['EDUCATION'].astype('category')
-            self.data['PAY_1'] = self.data['PAY_1'].astype('category')
-            self.data['PAY_2'] = self.data['PAY_2'].astype('category')
-            self.data['PAY_3'] = self.data['PAY_3'].astype('category')
-            self.data['PAY_4'] = self.data['PAY_4'].astype('category')
-            self.data['PAY_5'] = self.data['PAY_5'].astype('category')
-            self.data['PAY_6'] = self.data['PAY_6'].astype('category')
-            self.data['y'] = self.data['y'].astype('category')
+            self.data['SEX'] = data['SEX'].astype('category')
+            self.data['EDUCATION'] = data['EDUCATION'].astype('category')
+            self.data['PAY_1'] = data['PAY_1'].astype('category')
+            self.data['PAY_2'] = data['PAY_2'].astype('category')
+            self.data['PAY_3'] = data['PAY_3'].astype('category')
+            self.data['PAY_4'] = data['PAY_4'].astype('category')
+            self.data['PAY_5'] = data['PAY_5'].astype('category')
+            self.data['PAY_6'] = data['PAY_6'].astype('category')
+            self.data['y'] = data['y'].astype('category')
             self.log_obj.appnd_log('CHANGED DATA TYPE')
+            return  self.data
         except Exception as e:
             self.log_obj.appnd_log('FAILED TO CHANGE DATA TYPE->' + str(e))
 
@@ -76,6 +77,7 @@ class data_transform:
             self.data['PAY_5'] = self.data['PAY_5'].map({-1: 0, -2: 0, 0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8})
             self.data['PAY_6'] = self.data['PAY_6'].map({-1: 0, -2: 0, 0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8})
             self.log_obj.appnd_log('MAPPING COMPLETED')
+            return self.data
         except Exception as e:
             self.log_obj.appnd_log('FAILED TO MAP DATA->' + str(e))
 
@@ -105,7 +107,13 @@ class data_transform:
 
                     self.log_obj.appnd_log(
                                    'Column search for Standard Deviation of Zero Successful. Exited the get_columns_with_zero_std_deviation method of the Preprocessor class')
-            self.useful_data = self.data.drop(labels=self.col_to_drop, axis=1)
+                    self.useful_data = self.data.drop(labels=self.col_to_drop, axis=1)
+                    return self.useful_data
+                else:
+                    self.log_obj.appnd_log("0 COLUMNS FOUND WITH ZERO_STANDARD DEVIATION")
+                    return self.data
+
+
         except Exception as e:
             self.log_obj.appnd_log(
                                    'Exception occured in get_columns_with_zero_std_deviation method of the Preprocessor class. Exception message:  ' + str(
@@ -130,6 +138,10 @@ class data_transform:
             self.scaling = StandardScaler()
             self.x =self.data.drop(['y'],axis=1)
             self.X =self.scaling.fit_transform(self.x)
+            self.columns = self.x.columns
+            self.X = pd.DataFrame(data = self.X,columns=self.columns)
+            self.X['y'] = self.data['y']
+
             self.log_obj.appnd_log('standard scaling completed')
             return self.X
         except Exception as e:

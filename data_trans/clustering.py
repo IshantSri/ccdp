@@ -24,7 +24,7 @@ class kmeansclustering:
             plt.xlabel('Number of clusters')
             plt.ylabel('WCSS')
             plt.savefig('K-Means_Elbow_point.PNG')
-            self.logobj.appnd_log('Elbow Method FAILED')
+            self.logobj.appnd_log('COMPLETED ELBOW PLOT')
 
             # finding the value of the optimum cluster
             self.kn = KneeLocator(range(1, 11), wcss, curve='convex', direction='decreasing')
@@ -38,9 +38,8 @@ class kmeansclustering:
             X = data.iloc[:, :]
             kmean = KMeans(n_clusters= self.kn.knee)
             data['clusters'] = kmean.fit_predict(X)
-
-
             self.logobj.appnd_log('DATA CLUSTERED WITH CALCULATED ELBOW POINT>>>>>>' + '\t' + str(self.kn.knee))
+            return data
         except Exception as e:
             self.logobj.appnd_log(
                 'Exception while clustering. Exception message: ' + '\t' + str(
