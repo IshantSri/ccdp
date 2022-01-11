@@ -6,7 +6,7 @@ from model_select.best_algo import Model_Finder
 
 class train:
     def __init__(self,data_path):
-        self.logobj = logging('logs\model_building_log.txt', 'ENTERED TO DATA MODEL BUILDING MODULE')
+        self.logobj = logging('log\model_building_log.txt', 'ENTERED TO DATA MODEL BUILDING MODULE')
         self.logobj.log()
         self.data_path = datagetter(data_path)
         self.data = self.data_path.getdata()
@@ -52,7 +52,7 @@ class train:
             self.logobj.appnd_log('LABEL EXTRACTION FAILED>>>>>>' + str(e))
 
         try:
-            self.bestmodl = Model_Finder
+
 
 
 

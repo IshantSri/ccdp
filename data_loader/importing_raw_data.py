@@ -5,7 +5,7 @@ import pandas as pd
 class datagetter:
     def __init__(self, data_loc):
         self.data_loc = data_loc
-        self.log_file = 'logs/data_info_log.txt'
+        self.log_file = 'log/data_info_log.txt'
 
     def getdata(self):
         self.logobj = logging(self.log_file, 'ENTERED TO DATA LOADING -> DATA GETTER MODULE')

@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 class data_transform:
 
     def __init__(self):
-        self.log_file = 'logs/data_transform.txt'
+        self.log_file = 'log/data_transform.txt'
         self.log_obj = logging(self.log_file, 'ENTERED TO DATA TRANSFORMATION')
         self.log_obj.log()
 

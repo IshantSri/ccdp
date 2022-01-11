@@ -14,7 +14,7 @@ class Model_Finder:
 
     def __init__(self,file_object):
         self.file_object = file_object
-        self.logger_object = logging('logs\model_select_log.txt', 'ENTERED TO DATA MODEL SELECTION MODULE')
+        self.logger_object = logging('log\model_select_log.txt', 'ENTERED TO DATA MODEL SELECTION MODULE')
         self.logger_object.log()
         self.clf = RandomForestClassifier()
         self.xgb = XGBClassifier(objective='binary:logistic')

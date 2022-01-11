@@ -8,7 +8,7 @@ from sklearn.cluster import KMeans
 class kmeansclustering:
     def __init__(self):
 
-        self.logobj = logging('logs\clustering_log.txt', 'ENTERED TO DATA CLUSTERING')
+        self.logobj = logging('log\clustering_log.txt', 'ENTERED TO DATA CLUSTERING')
         self.logobj.log()
 
     def create_clusters(self,data):
