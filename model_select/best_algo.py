@@ -1,8 +1,9 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
-from sklearn.metrics  import roc_auc_score,accuracy_score,precision_score,recall_score,confusion_matrix
+from sklearn.metrics  import roc_auc_score,accuracy_score,precision_score,recall_score,confusion_matrix,ConfusionMatrixDisplay
 from log_create.logger import logging
+import matplotlib.pyplot as plt
 
 class Model_Finder:
     """
@@ -90,9 +91,9 @@ class Model_Finder:
             # initializing with different combination of parameters
             self.param_grid_xgboost = {
 
-                'learning_rate': [0.5, 0.1, 0.01, 0.001],
+                'learning_rate': [0.8, 0.1, 0.01, 0.001],
                 'max_depth': [3, 5, 10, 20],
-                'n_estimators': [10, 50, 100, 200]
+                'n_estimators': [10, 50,200,250]
 
             }
             # Creating an object of the Grid Search class
@@ -146,7 +147,10 @@ class Model_Finder:
                 self.recall = recall_score(self.test_y, self.prediction_xgboost)
                 self.pricision = precision_score(self.test_y, self.prediction_xgboost)
                 self.matrix = confusion_matrix(self.test_y,self.prediction_xgboost)
-                self.accuracy = accuracy_score(self.test_y, self.prediction_xgboost)
+                cm = confusion_matrix(self.test_y, self.prediction_xgboost)
+                disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+                disp.plot()
+                plt.savefig('cm.PNG')
                 self.logger_object.appnd_log( 'Accuracy for XGBoost:' + str(self.xgboost_score)+
                                               'with recall '+str(self.recall)+'and precision '+str(self.pricision)+
                                               " where confusion mtrx is "+str(self.matrix))  # Log AUC
@@ -156,10 +160,17 @@ class Model_Finder:
                 self.recall = recall_score(self.test_y,self.prediction_xgboost)
                 self.matrix = confusion_matrix(self.test_y, self.prediction_xgboost)
                 self.accuracy = accuracy_score(self.test_y,self.prediction_xgboost)
+                cm = confusion_matrix(self.test_y, self.prediction_xgboost)
+                disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+                disp.plot()
+                plt.savefig('cm.PNG')
                 self.logger_object.appnd_log( 'AUC for XGBoost:' + str(self.xgboost_score)) # Log AUC
                 self.logger_object.appnd_log('Accuracy for XGBoost:' + str(self.accuracy) +
                                              'with recall '+str(self.recall)+'and precision '+str(self.pricision)+
                                              " where confusion mtrx is "+str(self.matrix))
+
+
+
             # create best model for Random Forest
             self.random_forest=self.get_best_params_for_random_forest()
             self.prediction_random_forest=self.random_forest.predict(self.test_x) # prediction using the Random Forest Algorithm

@@ -55,7 +55,7 @@ class train:
                 self.logobj.appnd_log('EXTRACTED LABEL AND FEATURE COULMN')
 
                 # splitting the data into training and test set for each cluster one by one
-                x_train,y_train,x_test, y_test = train_test_split(cluster_features, cluster_label, test_size=1 / 3, random_state=360)
+                x_train,y_train,x_test, y_test = train_test_split(cluster_features, cluster_label, test_size=0.3, random_state=50)
                 self.logobj.appnd_log('TRAIN TEST SPLIT COMPLETED')
                 model_finder=Model_Finder(x_train, x_test, y_train, y_test) # object initialization
 
