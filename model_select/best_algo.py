@@ -1,14 +1,15 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
-from sklearn.metrics  import roc_auc_score,accuracy_score
+from sklearn.metrics  import roc_auc_score,accuracy_score,precision_score,recall_score,confusion_matrix
 from log_create.logger import logging
+
 class Model_Finder:
     """
                 This class shall  be used to find the model with best accuracy and AUC score.
-                Written By: iNeuron Intelligence
-                Version: 1.0
-                Revisions: None
+                Written By:
+                Version:
+                Revisions:
 
                 """
 
@@ -27,12 +28,12 @@ class Model_Finder:
                                 Method Name: get_best_params_for_random_forest
                                 Description: get the parameters for Random Forest Algorithm which give the best accuracy.
                                              Use Hyper Parameter Tuning.
-                                Output: The model with the best parameters
-                                On Failure: Raise Exception
+                                Output: model with the best parameters
 
-                                Written By: iNeuron Intelligence
-                                Version: 1.0
-                                Revisions: None
+
+                                Written By:
+                                Version:
+                                Revisions:
 
                         """
         self.logger_object.appnd_log("FINDING BEST PARAMETER FOR RANDOM FOREST")
@@ -76,9 +77,9 @@ class Model_Finder:
                                         Description: get the parameters for XGBoost Algorithm which give the best accuracy.
                                                      Use Hyper Parameter Tuning.
                                         Output: The model with the best parameters
-                                        On Failure: Raise Exception
 
-                                        Written By: iNeuron Intelligence
+
+                                        Written By:
                                         Version: 1.0
                                         Revisions: None
 
@@ -128,9 +129,9 @@ class Model_Finder:
                                                 Output: The best model name and the model object
                                                 On Failure: Raise Exception
 
-                                                Written By: iNeuron Intelligence
-                                                Version: 1.0
-                                                Revisions: None
+                                                Written By:
+                                                Version:
+                                                Revisions:
 
                                         """
         self.logger_object.appnd_log(
@@ -142,11 +143,23 @@ class Model_Finder:
 
             if len(self.test_y.unique()) == 1: #if there is only one label in y, then roc_auc_score returns error. We will use accuracy in that case
                 self.xgboost_score = accuracy_score(self.test_y, self.prediction_xgboost)
-                self.logger_object.appnd_log( 'Accuracy for XGBoost:' + str(self.xgboost_score))  # Log AUC
+                self.recall = recall_score(self.test_y, self.prediction_xgboost)
+                self.pricision = precision_score(self.test_y, self.prediction_xgboost)
+                self.matrix = confusion_matrix(self.test_y,self.prediction_xgboost)
+                self.accuracy = accuracy_score(self.test_y, self.prediction_xgboost)
+                self.logger_object.appnd_log( 'Accuracy for XGBoost:' + str(self.xgboost_score)+
+                                              'with recall '+str(self.recall)+'and precision '+str(self.pricision)+
+                                              " where confusion mtrx is "+str(self.matrix))  # Log AUC
             else:
                 self.xgboost_score = roc_auc_score(self.test_y, self.prediction_xgboost) # AUC for XGBoost
+                self.pricision = precision_score(self.test_y,self.prediction_xgboost)
+                self.recall = recall_score(self.test_y,self.prediction_xgboost)
+                self.matrix = confusion_matrix(self.test_y, self.prediction_xgboost)
+                self.accuracy = accuracy_score(self.test_y,self.prediction_xgboost)
                 self.logger_object.appnd_log( 'AUC for XGBoost:' + str(self.xgboost_score)) # Log AUC
-
+                self.logger_object.appnd_log('Accuracy for XGBoost:' + str(self.accuracy) +
+                                             'with recall '+str(self.recall)+'and precision '+str(self.pricision)+
+                                             " where confusion mtrx is "+str(self.matrix))
             # create best model for Random Forest
             self.random_forest=self.get_best_params_for_random_forest()
             self.prediction_random_forest=self.random_forest.predict(self.test_x) # prediction using the Random Forest Algorithm
@@ -157,7 +170,7 @@ class Model_Finder:
             else:
                 self.random_forest_score = roc_auc_score(self.test_y, self.prediction_random_forest) # AUC for Random Forest
                 self.logger_object.appnd_log( 'AUC for RF:' + str(self.random_forest_score))
-
+                self.logger_object.appnd_log('Accuracy for RF:' + str(self.random_forest_score))
             #comparing the two models
             if(self.random_forest_score <  self.xgboost_score):
                 return 'XGBoost',self.xgboost

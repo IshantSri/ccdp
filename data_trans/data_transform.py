@@ -88,9 +88,9 @@ class data_transform:
                                                 Method Name: get_columns_with_zero_std_deviation
                                                 Description: This method finds out the columns which have a standard deviation of zero.
                                                 Output: List of the columns with standard deviation of zero
-                                                On Failure: Raise Exception
 
-                                                Written By: iNeuron Intelligence
+
+                                                Written By:
                                                 Version: 1.0
                                                 Revisions: None
                              """
