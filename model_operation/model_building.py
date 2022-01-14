@@ -36,13 +36,13 @@ class train:
         except Exception as e:
             self.logobj.appnd_log('PREPROCESSING FAILED >>>>>>'+ str(e))
 
-        #try:
+        try:
          #   self.logobj.appnd_log('CLUSTERING DATA')
           #  self.clustered_data = self.cluster.create_clusters(self.final_data)
         #except Exception as e:
          #   self.logobj.appnd_log('CLUSTERING FAILED>>>>>' + str(e))
 
-        try:
+
             # getting the unique clusters from our dataset
             #list_of_clusters = self.clustered_data['clusters'].unique()
             #for i in list_of_clusters:
