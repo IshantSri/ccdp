@@ -1,5 +1,5 @@
 from log_create.logger import logging
-from data_trans.clustering import kmeansclustering
+#from data_trans.clustering import kmeansclustering
 from data_trans.data_transform import data_transform
 from data_loader.importing_raw_data import datagetter
 from model_select.best_algo import Model_Finder
@@ -11,7 +11,7 @@ class train:
         self.data_path = datagetter(data_path)
         self.data = self.data_path.getdata()
         self.trans = data_transform()
-        self.cluster = kmeansclustering()
+        #self.cluster = kmeansclustering()
 
 
     def training(self):
@@ -36,26 +36,26 @@ class train:
         except Exception as e:
             self.logobj.appnd_log('PREPROCESSING FAILED >>>>>>'+ str(e))
 
-        try:
-            self.logobj.appnd_log('CLUSTERING DATA')
-            self.clustered_data = self.cluster.create_clusters(self.final_data)
-        except Exception as e:
-            self.logobj.appnd_log('CLUSTERING FAILED>>>>>' + str(e))
+        #try:
+         #   self.logobj.appnd_log('CLUSTERING DATA')
+          #  self.clustered_data = self.cluster.create_clusters(self.final_data)
+        #except Exception as e:
+         #   self.logobj.appnd_log('CLUSTERING FAILED>>>>>' + str(e))
 
         try:
             # getting the unique clusters from our dataset
-            list_of_clusters = self.clustered_data['clusters'].unique()
-            for i in list_of_clusters:
-                cluster_data = self.clustered_data[self.clustered_data['clusters']==i] # filter the data for one cluster
-                self.logobj.appnd_log('WORKING ON CLUSTER>>>> '+str(i))
+            #list_of_clusters = self.clustered_data['clusters'].unique()
+            #for i in list_of_clusters:
+             #   cluster_data = self.clustered_data[self.clustered_data['clusters']==i] # filter the data for one cluster
+              #  self.logobj.appnd_log('WORKING ON CLUSTER>>>> '+str(i))
 
                 # Prepare the feature and Label columns
-                cluster_features=cluster_data.drop(['y','clusters'],axis=1)
-                cluster_label= cluster_data['y']
+                cluster_features=self.final_data.drop(['y'],axis=1)
+                cluster_label= self.final_data['y']
                 self.logobj.appnd_log('EXTRACTED LABEL AND FEATURE COULMN')
 
                 # splitting the data into training and test set for each cluster one by one
-                x_train,y_train,x_test, y_test = train_test_split(cluster_features, cluster_label, test_size=0.3, random_state=50)
+                x_train,y_train,x_test, y_test = train_test_split(cluster_features, cluster_label, test_size=0.3, random_state=300)
                 self.logobj.appnd_log('TRAIN TEST SPLIT COMPLETED')
                 model_finder=Model_Finder(x_train, x_test, y_train, y_test) # object initialization
 

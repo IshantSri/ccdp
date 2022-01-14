@@ -91,9 +91,9 @@ class Model_Finder:
             # initializing with different combination of parameters
             self.param_grid_xgboost = {
 
-                'learning_rate': [0.8, 0.1, 0.01, 0.001],
-                'max_depth': [3, 5, 10, 20],
-                'n_estimators': [10, 50,200,250]
+                'learning_rate': [0.02, 0.1, 0.01, 0.05,0.001,1],
+                'max_depth': [3],
+                'n_estimators': [10, 1000,2000,250]
 
             }
             # Creating an object of the Grid Search class
@@ -160,10 +160,7 @@ class Model_Finder:
                 self.recall = recall_score(self.test_y,self.prediction_xgboost)
                 self.matrix = confusion_matrix(self.test_y, self.prediction_xgboost)
                 self.accuracy = accuracy_score(self.test_y,self.prediction_xgboost)
-                cm = confusion_matrix(self.test_y, self.prediction_xgboost)
-                disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-                disp.plot()
-                plt.savefig('cm.PNG')
+
                 self.logger_object.appnd_log( 'AUC for XGBoost:' + str(self.xgboost_score)) # Log AUC
                 self.logger_object.appnd_log('Accuracy for XGBoost:' + str(self.accuracy) +
                                              'with recall '+str(self.recall)+'and precision '+str(self.pricision)+
@@ -178,15 +175,52 @@ class Model_Finder:
             if len(self.test_y.unique()) == 1:#if there is only one label in y, then roc_auc_score returns error. We will use accuracy in that case
                 self.random_forest_score = accuracy_score(self.test_y,self.prediction_random_forest)
                 self.logger_object.appnd_log( 'Accuracy for RF:' + str(self.random_forest_score))
+                self.matrix2 = confusion_matrix(self.test_y, self.prediction_random_forest)
+                self.pricision2 = precision_score(self.test_y, self.prediction_random_forest)
+                self.recall2 = recall_score(self.test_y, self.prediction_random_forest)
+                self.logger_object.appnd_log(
+                    'AcC for:' + str(self.random_forest_score) +
+                    'xgboost with recall ' + str(self.recall2) + 'and precision ' + str(
+                        self.pricision2) + " where confusion mtrx is " + str(self.matrix2))
             else:
                 self.random_forest_score = roc_auc_score(self.test_y, self.prediction_random_forest) # AUC for Random Forest
-                self.logger_object.appnd_log( 'AUC for RF:' + str(self.random_forest_score))
-                self.logger_object.appnd_log('Accuracy for RF:' + str(self.random_forest_score))
+
+                self.matrix2 = confusion_matrix(self.test_y, self.prediction_random_forest)
+                self.pricision2 = precision_score(self.test_y, self.prediction_random_forest)
+                self.recall2= recall_score(self.test_y, self.prediction_random_forest)
+                self.logger_object.appnd_log(
+                    'AUC :' + str(self.random_forest_score) +
+                    'xgboost with recall ' + str(self.recall2) + 'and precision ' + str(
+                        self.pricision2) + " where confusion mtrx is " + str(self.matrix2))
+
+
+
             #comparing the two models
-            if(self.random_forest_score <  self.xgboost_score):
+            if(self.recall2<  self.recall):
+                cm = confusion_matrix(self.test_y, self.prediction_xgboost)
+                disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+                disp.plot()
+                plt.savefig('cm.PNG')
+                self.logger_object.appnd_log( 'AUC for XGBoost:' + str(self.xgboost_score)+'Accuracy for XGBoost:' + str(self.accuracy)+
+                    'xgboost with recall ' + str(self.recall) + 'and precision ' + str(
+                        self.pricision) + " where confusion mtrx is " + str(self.matrix))
                 return 'XGBoost',self.xgboost
+
             else:
+                cm = confusion_matrix(self.test_y, self.prediction_random_forest)
+                disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+                disp.plot()
+                plt.savefig('RF.PNG')
+                self.logger_object.appnd_log(
+                    'AUC for XGBoost:' + str(self.random_forest_score) +
+                    'xgboost with recall ' + str(self.recall2) + 'and precision ' + str(
+                        self.pricision2) + " where confusion mtrx is " + str(self.matrix2))
+                self.logger_object.appnd_log('AUC for XGBoost:' + str(self.random_forest_score))  # Log AUC
+
+                self.logger_object.appnd_log(
+                                             'RF with recall ' + str(self.recall2) + 'and precision ' + str(self.pricision2) +" where confusion mtrx is " + str(self.matrix2))
                 return 'RandomForest',self.random_forest
+
 
         except Exception as e:
             self.logger_object.appnd_log(
