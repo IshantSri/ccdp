@@ -1,9 +1,12 @@
 from log_create.logger import logging
-#from data_trans.clustering import kmeansclustering
+from data_trans.clustering import kmeansclustering
 from data_trans.data_transform import data_transform
 from data_loader.importing_raw_data import datagetter
 from model_select.best_algo import Model_Finder
 from sklearn.model_selection import train_test_split
+import pickle
+
+
 class train:
     def __init__(self,data_path):
         self.logobj = logging('log\model_building_log.txt', 'ENTERED TO DATA MODEL BUILDING MODULE')
@@ -11,7 +14,7 @@ class train:
         self.data_path = datagetter(data_path)
         self.data = self.data_path.getdata()
         self.trans = data_transform()
-        #self.cluster = kmeansclustering()
+        self.cluster = kmeansclustering()
 
 
     def training(self):
@@ -36,44 +39,58 @@ class train:
         except Exception as e:
             self.logobj.appnd_log('PREPROCESSING FAILED >>>>>>'+ str(e))
 
+
         try:
-         #   self.logobj.appnd_log('CLUSTERING DATA')
-          #  self.clustered_data = self.cluster.create_clusters(self.final_data)
-        #except Exception as e:
-         #   self.logobj.appnd_log('CLUSTERING FAILED>>>>>' + str(e))
+            self.logobj.appnd_log('CLUSTERING DATA')
+            self.clustered_data = self.cluster.create_clusters(self.final_data)
+        except Exception as e:
+            self.logobj.appnd_log('CLUSTERING FAILED>>>>>' + str(e))
 
 
-            # getting the unique clusters from our dataset
-            #list_of_clusters = self.clustered_data['clusters'].unique()
-            #for i in list_of_clusters:
-             #   cluster_data = self.clustered_data[self.clustered_data['clusters']==i] # filter the data for one cluster
-              #  self.logobj.appnd_log('WORKING ON CLUSTER>>>> '+str(i))
+        try:
+           # getting the unique clusters from our dataset
+            list_of_clusters = self.clustered_data['clusters'].unique()
+            for i in list_of_clusters:
+                self.cluster_data = self.clustered_data[self.clustered_data['clusters']==i] # filter the data for one cluster
+                self.logobj.appnd_log('WORKING ON CLUSTER>>>> '+str(i))
+                #feature extraction
+                self.cluster_features= self.cluster_data.drop(['y','clusters'], axis=1)
 
-                # Prepare the feature and Label columns
-                cluster_features=self.final_data.drop(['y'],axis=1)
-                cluster_label= self.final_data['y']
+                self.cluster_label= self.cluster_data['y']
                 self.logobj.appnd_log('EXTRACTED LABEL AND FEATURE COULMN')
-
                 # splitting the data into training and test set for each cluster one by one
-                x_train,y_train,x_test, y_test = train_test_split(cluster_features, cluster_label, test_size=0.3, random_state=300)
+                self.x_train,self.y_train,self.x_test, self.y_test = train_test_split(self.cluster_features, self.cluster_label, test_size=0.3, random_state=300)
                 self.logobj.appnd_log('TRAIN TEST SPLIT COMPLETED')
-                model_finder=Model_Finder(x_train, x_test, y_train, y_test) # object initialization
+
+                self.model_finder=Model_Finder(self.x_train, self.x_test, self.y_train, self.y_test) # object initialization
 
 
                 self.logobj.appnd_log('ENTERED TO BEST MODEL FINDING STAGE')
 
 
                 #getting the best model for each of the clusters
-                best_model_name,best_model=model_finder.get_best_model()
+                self.best_model_name,self.best_model=self.model_finder.get_best_model()
                 self.logobj.appnd_log('MODEL FINDING COMPLETED BEST MODEL IS'
-                                      + str(best_model_name)+" WITH SCORE"+str(best_model))
+                                      + str(self.best_model_name)+" WITH "+str(self.best_model))
+
         except Exception as e:
-            self.logobj.appnd_log('MODEL EVALUATION FAILED>>>>'+str(e))
+            self.logobj.appnd_log('FAILED TO FIND THE BEST MODEL>>> '+str(e))
 
 
-                #saving the best model to the directory.
-                #file_op = file_methods.File_Operation(self.file_object,self.log_writer)
-                #save_model=file_op.save_model(best_model,best_model_name+str(i))
+                # saving the best model to the directory.
+        try:
+            pickle.dump(self.best_model,open('ccdp.pkl','wb'))
+            self.logobj.appnd_log("SAVED MODEL AS ccdp.pkl")
+        except Exception as e:
+            self.logobj.appnd_log("FAILED TO SAVE THE MODEL>>>>>> " + str(e))
+
+
+
+
+
+
+
+
 
 
 

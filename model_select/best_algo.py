@@ -159,10 +159,10 @@ class Model_Finder:
                 self.pricision = precision_score(self.test_y,self.prediction_xgboost)
                 self.recall = recall_score(self.test_y,self.prediction_xgboost)
                 self.matrix = confusion_matrix(self.test_y, self.prediction_xgboost)
-                self.accuracy = accuracy_score(self.test_y,self.prediction_xgboost)
 
-                self.logger_object.appnd_log( 'AUC for XGBoost:' + str(self.xgboost_score)) # Log AUC
-                self.logger_object.appnd_log('Accuracy for XGBoost:' + str(self.accuracy) +
+
+
+                self.logger_object.appnd_log( 'AUC for XGBoost:' + str(self.xgboost_score) +
                                              'with recall '+str(self.recall)+'and precision '+str(self.pricision)+
                                              " where confusion mtrx is "+str(self.matrix))
 
@@ -178,8 +178,9 @@ class Model_Finder:
                 self.matrix2 = confusion_matrix(self.test_y, self.prediction_random_forest)
                 self.pricision2 = precision_score(self.test_y, self.prediction_random_forest)
                 self.recall2 = recall_score(self.test_y, self.prediction_random_forest)
+
                 self.logger_object.appnd_log(
-                    'AcC for:' + str(self.random_forest_score) +
+                    'Accuracy for RF:' + str(self.random_forest_score) +
                     'xgboost with recall ' + str(self.recall2) + 'and precision ' + str(
                         self.pricision2) + " where confusion mtrx is " + str(self.matrix2))
             else:
@@ -189,7 +190,7 @@ class Model_Finder:
                 self.pricision2 = precision_score(self.test_y, self.prediction_random_forest)
                 self.recall2= recall_score(self.test_y, self.prediction_random_forest)
                 self.logger_object.appnd_log(
-                    'AUC :' + str(self.random_forest_score) +
+                    'AUC RF :' + str(self.random_forest_score) +
                     'xgboost with recall ' + str(self.recall2) + 'and precision ' + str(
                         self.pricision2) + " where confusion mtrx is " + str(self.matrix2))
 
@@ -201,9 +202,8 @@ class Model_Finder:
                 disp = ConfusionMatrixDisplay(confusion_matrix=cm)
                 disp.plot()
                 plt.savefig('cm.PNG')
-                self.logger_object.appnd_log( 'AUC for XGBoost:' + str(self.xgboost_score)+'Accuracy for XGBoost:' + str(self.accuracy)+
-                    'xgboost with recall ' + str(self.recall) + 'and precision ' + str(
-                        self.pricision) + " where confusion mtrx is " + str(self.matrix))
+                self.logger_object.appnd_log(  'xgboost with recall ' + str(self.recall) + 'and precision ' +
+                                               str(self.pricision) + " where confusion mtrx is " + str(self.matrix))
                 return 'XGBoost',self.xgboost
 
             else:
@@ -211,14 +211,8 @@ class Model_Finder:
                 disp = ConfusionMatrixDisplay(confusion_matrix=cm)
                 disp.plot()
                 plt.savefig('RF.PNG')
-                self.logger_object.appnd_log(
-                    'AUC for XGBoost:' + str(self.random_forest_score) +
-                    'xgboost with recall ' + str(self.recall2) + 'and precision ' + str(
-                        self.pricision2) + " where confusion mtrx is " + str(self.matrix2))
-                self.logger_object.appnd_log('AUC for XGBoost:' + str(self.random_forest_score))  # Log AUC
-
-                self.logger_object.appnd_log(
-                                             'RF with recall ' + str(self.recall2) + 'and precision ' + str(self.pricision2) +" where confusion mtrx is " + str(self.matrix2))
+                self.logger_object.appnd_log('RF with recall ' + str(self.recall2) + 'and precision ' +
+                                             str(self.pricision2) +" where confusion mtrx is " + str(self.matrix2))
                 return 'RandomForest',self.random_forest
 
 

@@ -153,9 +153,9 @@ class data_transform:
         self.data = data
         self.log_obj.appnd_log('entered to dependent label extraction')
         try:
-            self.y = self.data['y']
+            self.feature = self.data.drop(['y'], axis = 1)
             self.log_obj.appnd_log('dependent label extracted')
-            return self.y
+            return self.feature
         except Exception as e:
             self.log_obj.appnd_log('dependent label extraction failed >>>>>>' + str(e))
 
@@ -166,7 +166,7 @@ class data_transform:
         self.data = data
         self.log_obj.appnd_log('saving data')
         try:
-           self.data.to_csv('new_transformed.csv',index=False)
+           self.data.to_csv('predicted.csv',index=False)
            self.log_obj.appnd_log('data saved')
         except Exception as e:
             self.log_obj.appnd_log('failed to save data >>>>>' + str(e))
