@@ -6,7 +6,7 @@ from data_trans.clustering import kmeansclustering
 
 class predict:
     def __init__(self):
-        self.log_file = '../log/Prediction.txt'
+        self.log_file = './log/Prediction.txt'
         self.logobj = logging(self.log_file, 'ENTERED TO PREDICTION STAGE')
         self.logobj.log()
         self.cluster = kmeansclustering()

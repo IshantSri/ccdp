@@ -162,11 +162,12 @@ class data_transform:
 
 
 
-    def tocsv(self,data):
+    def tocsv(self,data,name):
         self.data = data
+        self.name = name
         self.log_obj.appnd_log('saving data')
         try:
-           self.data.to_csv('predicted.csv',index=False)
+           self.data.to_csv(self.name,index=False)
            self.log_obj.appnd_log('data saved')
         except Exception as e:
             self.log_obj.appnd_log('failed to save data >>>>>' + str(e))
