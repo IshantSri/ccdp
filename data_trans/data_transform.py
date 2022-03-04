@@ -18,7 +18,7 @@ class data_transform:
         self.data = data
         self.log_obj.appnd_log('IMPUTING NAN VALUES')
         try:
-            imputer = KNNImputer(n_neighbors=3, weights='uniform', missing_values=np.nan)
+            imputer = KNNImputer(n_neighbors=3, weights='uniform', missing_values= pd.isnull)
             self.new_array = imputer.fit_transform(self.data)  # impute the missing values
                     # convert the nd-array returned in the step above to a Dataframe
             self.columns = self.data.columns
@@ -84,16 +84,7 @@ class data_transform:
 
 
     def zero_stdv(self,data):
-        """
-                                                Method Name: get_columns_with_zero_std_deviation
-                                                Description: This method finds out the columns which have a standard deviation of zero.
-                                                Output: List of the columns with standard deviation of zero
 
-
-                                                Written By:
-                                                Version: 1.0
-                                                Revisions: None
-                             """
         self.log_obj.appnd_log(
                                'Entered the get_columns_with_zero_std_deviation method of the Preprocessor class')
         self.data = data

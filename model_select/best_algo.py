@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
-from sklearn.metrics  import roc_auc_score,accuracy_score,precision_score,recall_score,confusion_matrix,ConfusionMatrixDisplay
+from sklearn.metrics  import roc_auc_score,f1_score,accuracy_score,precision_score,recall_score,confusion_matrix,ConfusionMatrixDisplay
 from log_create.logger import logging
 import matplotlib.pyplot as plt
 
@@ -143,6 +143,7 @@ class Model_Finder:
             self.prediction_xgboost = self.xgboost.predict(self.test_x) # Predictions using the XGBoost Model
 
             if len(self.test_y.unique()) == 1: #if there is only one label in y, then roc_auc_score returns error. We will use accuracy in that case
+                self.xg_f1 = f1_score(self.test_y, self.prediction_xgboost)
                 self.xgboost_score = accuracy_score(self.test_y, self.prediction_xgboost)
                 self.recall = recall_score(self.test_y, self.prediction_xgboost)
                 self.pricision = precision_score(self.test_y, self.prediction_xgboost)
@@ -159,6 +160,7 @@ class Model_Finder:
                 self.pricision = precision_score(self.test_y,self.prediction_xgboost)
                 self.recall = recall_score(self.test_y,self.prediction_xgboost)
                 self.matrix = confusion_matrix(self.test_y, self.prediction_xgboost)
+                self.xg_f1 = f1_score(self.test_y, self.prediction_xgboost)
 
 
 
@@ -176,6 +178,7 @@ class Model_Finder:
                 self.random_forest_score = accuracy_score(self.test_y,self.prediction_random_forest)
                 self.logger_object.appnd_log( 'Accuracy for RF:' + str(self.random_forest_score))
                 self.matrix2 = confusion_matrix(self.test_y, self.prediction_random_forest)
+                self.rf_f1 = f1_score(self.test_y, self.prediction_random_forest)
                 self.pricision2 = precision_score(self.test_y, self.prediction_random_forest)
                 self.recall2 = recall_score(self.test_y, self.prediction_random_forest)
 
@@ -185,6 +188,7 @@ class Model_Finder:
                         self.pricision2) + " where confusion mtrx is " + str(self.matrix2))
             else:
                 self.random_forest_score = roc_auc_score(self.test_y, self.prediction_random_forest) # AUC for Random Forest
+                self.rf_f1 = f1_score(self.test_y, self.prediction_random_forest)
 
                 self.matrix2 = confusion_matrix(self.test_y, self.prediction_random_forest)
                 self.pricision2 = precision_score(self.test_y, self.prediction_random_forest)
@@ -197,12 +201,12 @@ class Model_Finder:
 
 
             #comparing the two models
-            if(self.recall2<  self.recall):
+            if(self.rf_f1 <  self.xg_f1):
                 cm = confusion_matrix(self.test_y, self.prediction_xgboost)
                 disp = ConfusionMatrixDisplay(confusion_matrix=cm)
                 disp.plot()
                 plt.savefig('cm.PNG')
-                self.logger_object.appnd_log(  'xgboost with recall ' + str(self.recall) + 'and precision ' +
+                self.logger_object.appnd_log("f1_score " + str(self.xg_f1) + ' xgboost with recall ' + str(self.recall) + 'and precision ' +
                                                str(self.pricision) + " where confusion mtrx is " + str(self.matrix))
                 return 'XGBoost',self.xgboost
 
@@ -211,7 +215,7 @@ class Model_Finder:
                 disp = ConfusionMatrixDisplay(confusion_matrix=cm)
                 disp.plot()
                 plt.savefig('RF.PNG')
-                self.logger_object.appnd_log('RF with recall ' + str(self.recall2) + 'and precision ' +
+                self.logger_object.appnd_log("f1_score " + str(self.rf_f1) +' RF with recall ' + str(self.recall2) + 'and precision ' +
                                              str(self.pricision2) +" where confusion mtrx is " + str(self.matrix2))
                 return 'RandomForest',self.random_forest
 
